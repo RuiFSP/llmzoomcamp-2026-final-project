@@ -17,11 +17,12 @@ The target users are tourists visiting Portugal, food enthusiasts curious about 
 ```mermaid
 flowchart LR
     subgraph Docker["Docker Compose"]
-        API["Flask API<br/>(gunicorn)"]
-        QD["Qdrant<br/>(vectors)"]
-        PG[("PostgreSQL<br/>(logs)")]
-        GF["Grafana<br/>(monitoring)"]
-        CD["Caddy<br/>(reverse proxy)"]
+        direction TB
+        API["Flask API"]
+        QD["Qdrant"]
+        PG["PostgreSQL"]
+        GF["Grafana"]
+        CD["Caddy"]
 
         API --> QD
         API --> PG
@@ -30,15 +31,15 @@ flowchart LR
     end
 
     subgraph UI["User Interface"]
-        CHAT["Chat UI<br/>(static HTML/JS)"]
+        CHAT["Chat UI"]
     end
 
     subgraph ING["Ingestion CLI"]
-        WP["Wikipedia<br/>PT + EN"]
-        IV["Infovini<br/>wine portal"]
-        MD["MDPI<br/>recipe dataset"]
-        CHUNK["Chunking<br/>+ Embedding"]
-        QD_UPLOAD["Qdrant<br/>upload"]
+        WP["Wikipedia"]
+        IV["Infovini"]
+        MD["MDPI"]
+        CHUNK["Chunking + Embedding"]
+        QD_UPLOAD["Qdrant upload"]
 
         WP --> CHUNK
         IV --> CHUNK
@@ -55,11 +56,11 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    Q["User question"] --> QR[Query Rewriter<br/>GPT-4o mini]
-    QR --> EMB[Embedder<br/>multilingual-e5-small]
-    EMB --> HYB[Hybrid Search<br/>Dense + Sparse (RRF)]
-    HYB --> RR[Re-ranker<br/>cross-encoder<br/>top-20 → top-5]
-    RR --> LLM[Answer Generator<br/>GPT-4o]
+    Q["User question"] --> QR["Query Rewriter<br/>GPT-4o mini"]
+    QR --> EMB["Embedder<br/>multilingual-e5-small"]
+    EMB --> HYB["Hybrid Search<br/>Dense + Sparse (RRF)"]
+    HYB --> RR["Re-ranker<br/>cross-encoder<br/>top-20 to top-5"]
+    RR --> LLM["Answer Generator<br/>GPT-4o"]
     LLM --> R["Answer + Citations"]
 ```
 
