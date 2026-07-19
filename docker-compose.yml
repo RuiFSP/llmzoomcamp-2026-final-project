@@ -47,7 +47,7 @@ services:
       retries: 5
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:11.5.2
     ports:
       - "3000:3000"
     environment:
@@ -58,6 +58,7 @@ services:
       - ./dashboards/grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml:ro
       - ./dashboards/grafana-dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml:ro
       - ./dashboards/food-wine-dashboard.json:/var/lib/grafana/dashboards/food-wine-dashboard.json:ro
+      - grafana_data:/var/lib/grafana
     depends_on:
       - postgres
 
@@ -77,5 +78,6 @@ services:
 volumes:
   qdrant_data:
   postgres_data:
+  grafana_data:
   caddy_data:
   caddy_config:
