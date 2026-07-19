@@ -38,9 +38,9 @@ open http://localhost:5000
 
 ## Screenshots
 
-| Chat Interface | Grafana Dashboard | Ingestion Pipeline |
-|---|---|---|
-| ![Chat](screenshots/chat-ui.png) | ![Grafana](screenshots/grafana.png) | ![Ingestion](screenshots/ingestion.png) |
+| Chat Interface | Grafana Dashboard | Ingestion Pipeline | Cloud Deployment |
+|---|---|---|---|
+| ![Chat](screenshots/chat-ui.png) | ![Grafana](screenshots/grafana.png) | ![Ingestion](screenshots/ingestion.png) | ![DigitalOcean](screenshots/digitalocean.png) |
 
 ## Project Structure
 
