@@ -1,164 +1,56 @@
 {
+  "title": "Food & Wine Guide - RAG Monitoring",
+  "uid": "food-wine-rag",
+  "time": {"from": "now-24h", "to": "now"},
   "panels": [
     {
-      "datasource": {
-        "type": "postgres",
-        "uid": "PostgreSQL"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 0
-      },
-      "id": 1,
-      "targets": [
-        {
-          "format": "time_series",
-          "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, COUNT(*) FROM conversations GROUP BY 1 ORDER BY 1",
-          "refId": "A"
-        }
-      ],
-      "title": "Query Throughput",
-      "type": "timeseries"
+      "id": 1, "title": "Query Throughput", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "description": "Number of chat requests per hour. Shows how many questions users ask the RAG system over time.",
+      "targets": [{"refId": "A", "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, COUNT(*) FROM conversations GROUP BY 1 ORDER BY 1", "format": "time_series"}]
     },
     {
-      "datasource": {
-        "type": "postgres",
-        "uid": "PostgreSQL"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "id": 2,
-      "targets": [
-        {
-          "format": "time_series",
-          "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, AVG(retrieval_latency_ms)::int FROM conversations GROUP BY 1 ORDER BY 1",
-          "refId": "A"
-        }
-      ],
-      "title": "Retrieval Latency (ms)",
-      "type": "timeseries"
+      "id": 2, "title": "Retrieval Latency (ms)", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "description": "Average time spent searching Qdrant (hybrid dense+sparse + cross-encoder reranker). Lower is better — high values may indicate Qdrant overload.",
+      "targets": [{"refId": "A", "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, AVG(retrieval_latency_ms)::int FROM conversations GROUP BY 1 ORDER BY 1", "format": "time_series"}]
     },
     {
-      "datasource": {
-        "type": "postgres",
-        "uid": "PostgreSQL"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
-      },
-      "id": 3,
-      "targets": [
-        {
-          "format": "time_series",
-          "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, AVG(llm_latency_ms)::int FROM conversations GROUP BY 1 ORDER BY 1",
-          "refId": "A"
-        }
-      ],
-      "title": "LLM Latency (ms)",
-      "type": "timeseries"
+      "id": 3, "title": "LLM Latency (ms)", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "description": "Average time GPT-4o takes to generate an answer. High values may indicate complex questions or OpenAI API slowdowns.",
+      "targets": [{"refId": "A", "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, AVG(llm_latency_ms)::int FROM conversations GROUP BY 1 ORDER BY 1", "format": "time_series"}]
     },
     {
-      "datasource": {
-        "type": "postgres",
-        "uid": "PostgreSQL"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 8
-      },
-      "id": 4,
-      "targets": [
-        {
-          "format": "time_series",
-          "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, SUM(prompt_tokens) AS prompt, SUM(completion_tokens) AS completion FROM conversations GROUP BY 1 ORDER BY 1",
-          "refId": "A"
-        }
-      ],
-      "title": "Token Usage",
-      "type": "timeseries"
+      "id": 4, "title": "Token Usage", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "description": "Prompt and completion tokens sent to GPT-4o per hour. Useful for tracking OpenAI API costs.",
+      "targets": [{"refId": "A", "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, SUM(prompt_tokens) AS prompt, SUM(completion_tokens) AS completion FROM conversations GROUP BY 1 ORDER BY 1", "format": "time_series"}]
     },
     {
-      "datasource": {
-        "type": "postgres",
-        "uid": "PostgreSQL"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 0,
-        "y": 16
-      },
-      "id": 5,
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT ROUND(COUNT(*) FILTER (WHERE error IS NOT NULL AND error != '') * 100.0 / NULLIF(COUNT(*), 0), 1) AS pct FROM conversations",
-          "refId": "A"
-        }
-      ],
-      "title": "Error Rate (%)",
-      "type": "stat"
+      "id": 5, "title": "Error Rate (%)", "type": "stat",
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 16},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "description": "Percentage of chat requests that failed with an exception (e.g. Qdrant down, OpenAI API errors, embedding failures). 0% means all requests completed successfully.",
+      "targets": [{"refId": "A", "rawSql": "SELECT ROUND(COUNT(*) FILTER (WHERE error IS NOT NULL AND error != '') * 100.0 / NULLIF(COUNT(*), 0), 1) AS pct FROM conversations", "format": "table"}]
     },
     {
-      "datasource": {
-        "type": "postgres",
-        "uid": "PostgreSQL"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 6,
-        "x": 6,
-        "y": 16
-      },
-      "id": 6,
-      "targets": [
-        {
-          "format": "table",
-          "rawSql": "SELECT COUNT(*) FROM conversations",
-          "refId": "A"
-        }
-      ],
-      "title": "Total Queries",
-      "type": "stat"
+      "id": 6, "title": "Total Queries", "type": "stat",
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 16},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "description": "Total number of chat questions asked since the system started.",
+      "targets": [{"refId": "A", "rawSql": "SELECT COUNT(*) FROM conversations", "format": "table"}]
     },
     {
-      "datasource": {
-        "type": "postgres",
-        "uid": "PostgreSQL"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 16
-      },
-      "id": 7,
-      "targets": [
-        {
-          "format": "time_series",
-          "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, AVG(total_latency_ms)::int FROM conversations GROUP BY 1 ORDER BY 1",
-          "refId": "A"
-        }
-      ],
-      "title": "Total Response Time (ms)",
-      "type": "timeseries"
+      "id": 7, "title": "Total Response Time (ms)", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "description": "End-to-end latency from receiving the question to returning the answer (embedding + retrieval + LLM). The most important metric for user experience.",
+      "targets": [{"refId": "A", "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, AVG(total_latency_ms)::int FROM conversations GROUP BY 1 ORDER BY 1", "format": "time_series"}]
     }
-  ],
-  "time": {
-    "from": "now-24h",
-    "to": "now"
-  },
-  "title": "Food & Wine Guide - RAG Monitoring",
-  "uid": "food-wine-rag"
+  ]
 }
