@@ -145,6 +145,9 @@ docker compose exec api python -m src.ingestion.run --reset
 
 The UI is in Portuguese (PT-PT). Here are example questions you can ask:
 
+![Chat UI](screenshots/chat-ui.png)
+*Chat interface showing a question and answer with citations.*
+
 | Pergunta | Resposta esperada |
 |---|---|
 | O que é o cozido à portuguesa? | Explica o prato tradicional com carnes, enchidos e vegetais cozidos. |
@@ -174,6 +177,11 @@ The UI is in Portuguese (PT-PT). Here are example questions you can ask:
 
 > Evaluated on a test set of 27 curated QA pairs (Wikipedia, Infovini, MDPI). Retrieval metrics across k=[1,3,5,10]. LLM quality scored by GPT-4o-mini-as-judge. See `notebooks/` for reproduction.
 
+### Ingestion Output
+
+![Ingestion pipeline](screenshots/ingestion.png)
+*Terminal output showing the ingestion pipeline with 1514 chunks and 1514 vectors.*
+
 ---
 
 ## Monitoring
@@ -192,6 +200,9 @@ Grafana is auto-provisioned with a PostgreSQL datasource and a pre-built dashboa
 | Total Response Time (ms) | Time series | End-to-end latency per hour |
 
 User feedback is collected via the `POST /api/feedback` endpoint.
+
+![Grafana dashboard](screenshots/grafana.png)
+*Grafana dashboard showing 8 panels with real-time metrics from the RAG system.*
 
 ---
 
