@@ -226,141 +226,165 @@
     </svg>
   </button>
 </div>
+<div id="error-banner"></div>
+<div id="js-error" style="display:none;background:#e74c3c;color:#fff;text-align:center;padding:12px;font-size:14px;flex-shrink:0;"></div>
 <script>
   (function() {
-    function generateId() {
-      try { return crypto.randomUUID(); } catch (e) {}
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
+    try {
+      var CONVERSATION_KEY = 'foodwine_conversation_id';
+      var conversationId = null;
+      try { conversationId = sessionStorage.getItem(CONVERSATION_KEY); } catch (e) {}
+      if (!conversationId) {
+        try { conversationId = crypto.randomUUID(); } catch (e) {
+          conversationId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+          });
+        }
+        try { sessionStorage.setItem(CONVERSATION_KEY, conversationId); } catch (e) {}
+      }
+
+      var chatContainer = document.getElementById('chat-container');
+      var inputEl = document.getElementById('question-input');
+      var sendBtn = document.getElementById('send-btn');
+      var errorBanner = document.getElementById('error-banner');
+      var jsError = document.getElementById('js-error');
+
+      if (!chatContainer || !inputEl || !sendBtn) {
+        var errDiv = jsError || document.createElement('div');
+        errDiv.textContent = 'Erro de inicialização: elementos da UI não encontrados. Recarregue a página.';
+        errDiv.style.display = 'block';
+        if (!jsError) document.body.prepend(errDiv);
+        return;
+      }
+
+      function scrollToBottom() {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
+
+      function showError(msg) {
+        errorBanner.textContent = msg;
+        errorBanner.classList.add('show');
+        setTimeout(function() { errorBanner.classList.remove('show'); }, 6000);
+      }
+
+      function formatContent(text) {
+        return text.replace(/\[(\d+)\]/g, '<sup class=\"citation-ref\">$1</sup>');
+      }
+
+      function addMessage(role, content, citations) {
+        var div = document.createElement('div');
+        div.className = 'message ' + role;
+        var contentP = document.createElement('div');
+        contentP.innerHTML = formatContent(content);
+        div.appendChild(contentP);
+        if (citations && citations.length > 0) {
+          var details = document.createElement('details');
+          details.className = 'citations';
+          var summary = document.createElement('summary');
+          summary.textContent = 'Fontes (' + citations.length + ')';
+          details.appendChild(summary);
+          var ol = document.createElement('ol');
+          citations.forEach(function(c) {
+            var li = document.createElement('li');
+            var preview = c.text_preview.length > 80 ? c.text_preview.substring(0, 80) + '…' : c.text_preview;
+            li.innerHTML = '<strong>[' + c.id + ']</strong> ' + c.title + ' <em>(' + c.source + ')</em><br><small>' + preview + '</small>';
+            ol.appendChild(li);
+          });
+          details.appendChild(ol);
+          div.appendChild(details);
+        }
+        chatContainer.appendChild(div);
+        scrollToBottom();
+      }
+
+      function showLoading() {
+        var div = document.createElement('div');
+        div.className = 'message assistant';
+        div.id = 'loading-msg';
+        div.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+        chatContainer.appendChild(div);
+        scrollToBottom();
+      }
+
+      function removeLoading() {
+        var el = document.getElementById('loading-msg');
+        if (el) el.remove();
+      }
+
+      function setLoading(loading) {
+        sendBtn.disabled = loading;
+        inputEl.disabled = loading;
+        if (loading) showLoading();
+        else removeLoading();
+      }
+
+      async function sendMessage() {
+        try {
+          var question = inputEl.value.trim();
+          if (!question) return;
+
+          inputEl.value = '';
+          addMessage('user', question);
+          setLoading(true);
+
+          var res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question: question, conversation_id: conversationId }),
+          });
+
+          if (!res.ok) {
+            var errData = {};
+            try { errData = await res.json(); } catch (e) {}
+            throw new Error(errData.error || 'Erro do servidor (' + res.status + ')');
+          }
+
+          var data = await res.json();
+          removeLoading();
+          if (data.answer.indexOf('Não tenho informação suficiente') !== -1) {
+            var div = document.createElement('div');
+            div.className = 'message system';
+            div.textContent = data.answer;
+            chatContainer.appendChild(div);
+            scrollToBottom();
+          } else {
+            addMessage('assistant', data.answer, data.citations || []);
+          }
+        } catch (err) {
+          removeLoading();
+          showError('Erro: ' + err.message + '. Tente novamente.');
+        } finally {
+          setLoading(false);
+          if (inputEl) inputEl.focus();
+        }
+      }
+
+      sendBtn.addEventListener('click', sendMessage);
+      inputEl.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
       });
-    }
-    const CONVERSATION_KEY = 'foodwine_conversation_id';
-    let conversationId = sessionStorage.getItem(CONVERSATION_KEY);
-    if (!conversationId) {
-      conversationId = generateId();
-      sessionStorage.setItem(CONVERSATION_KEY, conversationId);
-    }
 
-    const chatContainer = document.getElementById('chat-container');
-    const inputEl = document.getElementById('question-input');
-    const sendBtn = document.getElementById('send-btn');
-    const errorBanner = document.getElementById('error-banner');
-
-    function scrollToBottom() {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }
-
-    function showError(msg) {
-      errorBanner.textContent = msg;
-      errorBanner.classList.add('show');
-      setTimeout(() => errorBanner.classList.remove('show'), 6000);
-    }
-
-    function addMessage(role, content, citations) {
-      const div = document.createElement('div');
-      div.className = 'message ' + role;
-
-      const contentP = document.createElement('div');
-      contentP.innerHTML = formatContent(content);
-      div.appendChild(contentP);
-
-      if (citations && citations.length > 0) {
-        const details = document.createElement('details');
-        details.className = 'citations';
-        const summary = document.createElement('summary');
-        summary.textContent = 'Fontes (' + citations.length + ')';
-        details.appendChild(summary);
-
-        const ol = document.createElement('ol');
-        citations.forEach(function(c) {
-          const li = document.createElement('li');
-          const preview = c.text_preview.length > 80 ? c.text_preview.substring(0, 80) + '…' : c.text_preview;
-          li.innerHTML = '<strong>[' + c.id + ']</strong> ' + c.title + ' <em>(' + c.source + ')</em><br><small>' + preview + '</small>';
-          ol.appendChild(li);
-        });
-        details.appendChild(ol);
-        div.appendChild(details);
-      }
-
-      chatContainer.appendChild(div);
-      scrollToBottom();
-    }
-
-    function formatContent(text) {
-      return text.replace(/\[(\d+)\]/g, '<sup class="citation-ref">$1</sup>');
-    }
-
-    function showLoading() {
-      const div = document.createElement('div');
-      div.className = 'message assistant';
-      div.id = 'loading-msg';
-      div.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
-      chatContainer.appendChild(div);
-      scrollToBottom();
-    }
-
-    function removeLoading() {
-      const el = document.getElementById('loading-msg');
-      if (el) el.remove();
-    }
-
-    function setLoading(loading) {
-      sendBtn.disabled = loading;
-      inputEl.disabled = loading;
-      if (loading) {
-        showLoading();
-      } else {
-        removeLoading();
-      }
-    }
-
-    async function sendMessage() {
-      try {
-        const question = inputEl.value.trim();
-        if (!question) return;
-
-        inputEl.value = '';
-        addMessage('user', question);
-        setLoading(true);
-
-        const res = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: question, conversation_id: conversationId }),
-        });
-
-        if (!res.ok) {
-          const errData = await res.json().catch(function() { return {}; });
-          throw new Error(errData.error || 'Erro do servidor (' + res.status + ')');
-        }
-
-        const data = await res.json();
-        removeLoading();
-
-        if (data.answer.includes('Não tenho informação suficiente')) {
-          const div = document.createElement('div');
-          div.className = 'message system';
-          div.textContent = data.answer;
-          chatContainer.appendChild(div);
-          scrollToBottom();
-        } else {
-          addMessage('assistant', data.answer, data.citations || []);
-        }
-      } catch (err) {
-        removeLoading();
-        showError('Erro: ' + err.message + '. Tente novamente.');
-        addMessage('assistant', 'Desculpe, ocorreu um erro ao processar a sua pergunta. Por favor, tente novamente.');
-      } finally {
-        setLoading(false);
-        inputEl.focus();
-      }
+      inputEl.focus();
     } catch (err) {
-      showError('Erro inesperado: ' + (err.message || err) + '. Recarregue a página.');
+      var errDiv = document.getElementById('js-error');
+      if (!errDiv) {
+        errDiv = document.createElement('div');
+        errDiv.style.background = '#e74c3c';
+        errDiv.style.color = '#fff';
+        errDiv.style.textAlign = 'center';
+        errDiv.style.padding = '12px';
+        errDiv.style.fontSize = '14px';
+        document.body.prepend(errDiv);
+      }
+      errDiv.textContent = 'Erro: ' + (err.message || err) + '. Recarregue a página ou contacte o administrador.';
+      errDiv.style.display = 'block';
     }
-    }
-
-    sendBtn.addEventListener('click', sendMessage);
+  })();
+</script>
     inputEl.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
