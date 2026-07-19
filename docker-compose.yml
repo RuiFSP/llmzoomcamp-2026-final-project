@@ -1,0 +1,81 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_CHAT_MODEL=${OPENAI_CHAT_MODEL:-gpt-4o}
+      - OPENAI_REWRITER_MODEL=${OPENAI_REWRITER_MODEL:-gpt-4o-mini}
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-pgfoodwine}
+      - POSTGRES_USER=${POSTGRES_USER:-pgfoodwine}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pgfoodwine}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-pgfoodwine}
+      - POSTGRES_USER=${POSTGRES_USER:-pgfoodwine}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pgfoodwine}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pgfoodwine} -d ${POSTGRES_DB:-pgfoodwine}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=
+    volumes:
+      - ./dashboards/grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml:ro
+      - ./dashboards/grafana-dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml:ro
+      - ./dashboards/food-wine-dashboard.json:/var/lib/grafana/dashboards/food-wine-dashboard.json:ro
+    depends_on:
+      - postgres
+
+  caddy:
+    profiles: ["cloud"]
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+volumes:
+  qdrant_data:
+  postgres_data:
+  caddy_data:
+  caddy_config:

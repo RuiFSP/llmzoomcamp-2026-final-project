@@ -1,0 +1,87 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "title": "Food & Wine Guide - RAG Monitoring",
+  "uid": "food-wine-rag",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Query Throughput",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "targets": [{
+        "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, COUNT(*) AS count FROM conversations GROUP BY time ORDER BY time",
+        "format": "time_series"
+      }]
+    },
+    {
+      "id": 2,
+      "title": "Retrieval Latency (p50/p95/p99)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "targets": [{
+        "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, AVG(retrieval_latency_ms) AS avg, PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY retrieval_latency_ms) AS p50, PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY retrieval_latency_ms) AS p95 FROM conversations GROUP BY time ORDER BY time",
+        "format": "time_series"
+      }]
+    },
+    {
+      "id": 3,
+      "title": "LLM Latency (p50/p95)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "targets": [{
+        "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, AVG(llm_latency_ms) AS avg, PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY llm_latency_ms) AS p50, PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY llm_latency_ms) AS p95 FROM conversations GROUP BY time ORDER BY time",
+        "format": "time_series"
+      }]
+    },
+    {
+      "id": 4,
+      "title": "Token Usage",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "targets": [{
+        "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, SUM(prompt_tokens) AS prompt_tokens, SUM(completion_tokens) AS completion_tokens, SUM(total_tokens) AS total_tokens FROM conversations GROUP BY time ORDER BY time",
+        "format": "time_series"
+      }]
+    },
+    {
+      "id": 5,
+      "title": "Error Rate",
+      "type": "stat",
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 16},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "targets": [{
+        "rawSql": "SELECT COUNT(*) FILTER (WHERE error IS NOT NULL AND error != '') * 100.0 / NULLIF(COUNT(*), 0) AS error_rate FROM conversations",
+        "format": "table"
+      }]
+    },
+    {
+      "id": 6,
+      "title": "Feedback Score (Avg)",
+      "type": "stat",
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 16},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "targets": [{
+        "rawSql": "SELECT AVG(feedback) AS avg_feedback FROM conversations WHERE feedback != 0",
+        "format": "table"
+      }]
+    },
+    {
+      "id": 7,
+      "title": "Total Response Time (p50/p95)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "targets": [{
+        "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY total_latency_ms) AS p50, PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY total_latency_ms) AS p95 FROM conversations GROUP BY time ORDER BY time",
+        "format": "time_series"
+      }]
+    }
+  ]
+}
