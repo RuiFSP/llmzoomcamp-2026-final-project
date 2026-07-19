@@ -30,5 +30,15 @@ dev = [
 [project.scripts]
 ingest = "src.ingestion.run:main"
 
+[tool.ruff]
+target-version = "py314"
+line-length = 120
+
+[tool.ruff.lint.per-file-ignores]
+"src/evaluation/test_set.py" = ["E501"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I"]
+
 [tool.setuptools.packages.find]
 where = ["src"]

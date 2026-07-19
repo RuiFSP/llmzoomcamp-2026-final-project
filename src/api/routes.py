@@ -2,12 +2,12 @@ import logging
 import time
 import uuid
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, current_app, jsonify, request
 
+from src.api.answer import generate_answer
+from src.api.db import get_conversation_history, log_conversation, update_feedback
 from src.search.hybrid import hybrid_fusion
 from src.search.query_rewriter import rewrite_query
-from src.api.db import log_conversation, get_conversation_history, update_feedback
-from src.api.answer import generate_answer
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +145,7 @@ def health():
         logger.exception("Qdrant health check failed")
 
     try:
-        from src.api.db import _get_pool, _get_conn
+        from src.api.db import _get_conn
         with _get_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT 1")

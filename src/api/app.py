@@ -2,14 +2,14 @@ import logging
 import os
 
 from flask import Flask, send_from_directory
-from sentence_transformers import SentenceTransformer
 from openai import OpenAI
+from sentence_transformers import SentenceTransformer
 
-from src.search.dense import DenseRetriever
-from src.search.bm25 import BM25Retriever
-from src.search.reranker import Reranker
 from src.api.db import init_db
 from src.api.routes import api_bp
+from src.search.bm25 import BM25Retriever
+from src.search.dense import DenseRetriever
+from src.search.reranker import Reranker
 
 logger = logging.getLogger(__name__)
 

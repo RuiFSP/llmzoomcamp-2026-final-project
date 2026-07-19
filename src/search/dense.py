@@ -1,7 +1,7 @@
 import logging
 import os
+
 from qdrant_client import QdrantClient
-from qdrant_client.models import ScoredPoint
 
 logger = logging.getLogger(__name__)
 

@@ -4,12 +4,12 @@ import os
 import sys
 import uuid
 
-from src.ingestion.wikipedia import fetch_all_wikipedia
-from src.ingestion.infovini import fetch_all_infovini
-from src.ingestion.mdpi import fetch_mdpi_recipes
 from src.ingestion.chunking import chunk_document
 from src.ingestion.embedding import embed_texts
+from src.ingestion.infovini import fetch_all_infovini
+from src.ingestion.mdpi import fetch_mdpi_recipes
 from src.ingestion.qdrant_index import create_collection, upload_documents
+from src.ingestion.wikipedia import fetch_all_wikipedia
 
 logging.basicConfig(
     level=logging.INFO,

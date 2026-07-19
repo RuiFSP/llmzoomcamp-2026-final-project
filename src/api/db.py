@@ -61,7 +61,9 @@ def init_db() -> None:
                 )
             """)
             cur.execute("CREATE INDEX IF NOT EXISTS idx_conversations_created_at ON conversations(created_at)")
-            cur.execute("CREATE INDEX IF NOT EXISTS idx_conversations_conversation_id ON conversations(conversation_id)")
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_conversations_conversation_id ON conversations(conversation_id)"
+            )
             cur.execute("CREATE INDEX IF NOT EXISTS idx_conversations_error ON conversations(error)")
         conn.commit()
 

@@ -1,4 +1,5 @@
 import logging
+
 from sentence_transformers import CrossEncoder
 
 logger = logging.getLogger(__name__)
