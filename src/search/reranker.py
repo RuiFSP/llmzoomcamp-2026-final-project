@@ -18,7 +18,13 @@ def _get_model(model_name: str) -> CrossEncoder:
 class Reranker:
     def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"):
         self.model_name = model_name
-        self.model = _get_model(model_name)
+        self._model = None
+
+    @property
+    def model(self):
+        if self._model is None:
+            self._model = _get_model(self.model_name)
+        return self._model
 
     def rerank(self, query: str, documents: list[dict], top_k: int = 5) -> list[dict]:
         if not documents:
