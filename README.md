@@ -78,6 +78,6 @@ Tourists and food enthusiasts exploring Portuguese gastronomy face information s
 | **Answer Generator** | GPT-4o |
 | **Orchestration** | Docker Compose (4 services + optional Caddy for TLS) |
 
-## Evaluation Criteria
+## Evaluation
 
-See [EVALUATION.md](EVALUATION.md) for the LLM Zoomcamp 2026 final project scoring checklist.
+See [Evaluation Results](docs/evaluation.md) for retrieval metrics and LLM answer quality scores.
