@@ -1,21 +1,11 @@
 import marimo
+
 app = marimo.App()
 
 @app.cell
 def __():
     import sys
     sys.path.insert(0, "..")
-    import json
-    import numpy as np
-    import pandas as pd
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    from src.evaluation.test_set import TEST_SET
-    from src.search.dense import DenseRetriever
-    from src.search.bm25 import BM25Retriever
-    from src.search.hybrid import hybrid_fusion
-    from src.search.reranker import Reranker
-    from src.ingestion.embedding import embed_query
     return
 
 @app.cell

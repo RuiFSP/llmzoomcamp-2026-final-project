@@ -33,6 +33,7 @@ ingest = "src.ingestion.run:main"
 [tool.ruff]
 target-version = "py314"
 line-length = 120
+extend-exclude = ["notebooks/*.py"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/evaluation/test_set.py" = ["E501"]
