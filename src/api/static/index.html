@@ -228,10 +228,17 @@
 </div>
 <script>
   (function() {
+    function generateId() {
+      try { return crypto.randomUUID(); } catch (e) {}
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
     const CONVERSATION_KEY = 'foodwine_conversation_id';
     let conversationId = sessionStorage.getItem(CONVERSATION_KEY);
     if (!conversationId) {
-      conversationId = crypto.randomUUID();
+      conversationId = generateId();
       sessionStorage.setItem(CONVERSATION_KEY, conversationId);
     }
 
