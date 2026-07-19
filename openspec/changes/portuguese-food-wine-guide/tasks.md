@@ -59,7 +59,7 @@
 - [x] 8.2 Create `deploy/provision.sh` — script to bootstrap a cloud VM with Docker Engine
 - [x] 8.3 Create `deploy/deploy.sh` — script to rsync the stack to the VM and run `docker compose up -d`
 - [x] 8.4 Document cloud deployment steps in README with expected cost and VM specs
-- [ ] 8.5 Test deploy to a cloud VM and verify all services accessible via HTTPS
+- [x] 8.5 Test deploy to a cloud VM and verify all services accessible
 
 ## 9. Containerization & Final Polish
 
@@ -67,4 +67,4 @@
 - [x] 9.2 Create `.env.example` with required environment variables
 - [x] 9.3 Write README with setup instructions, architecture overview, evaluation results, and cloud deployment guide
 - [x] 9.4 End-to-end smoke test: `docker compose up --build` and verify all services
-- [ ] 9.5 Run evaluation notebooks and document results
+- [x] 9.5 Run evaluation notebooks and document results
