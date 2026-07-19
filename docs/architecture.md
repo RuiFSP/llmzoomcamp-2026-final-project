@@ -77,6 +77,18 @@ flowchart LR
 | **Infovini** | Scraped wine portal | Wine regions, grape varieties, wine-food pairings |
 | **MDPI Recipe Dataset** | Academic recipe dataset (1382 recipes, CC-BY) | Structured Portuguese recipe data with ingredients |
 
+## Technology Decisions
+
+We evaluated several tools from the LLM Zoomcamp course and opted not to use them for these reasons:
+
+| Tool | Considered For | Decision |
+|---|---|---|
+| **LangChain** | Framework for LLM chains and agents | Not used. Our retrieval pipeline is simple and well-suited to direct API calls. Adding LangChain would add abstraction without benefit. |
+| **dlt** | Data ingestion pipeline with schema validation | Not used. Our data sources are static (Wikipedia, Infovini scrape, MDPI zip). No incremental loading needed. A Python CLI is sufficient. |
+| **Kestra** | Workflow orchestration and scheduling | Not used. Ingestion runs once per deployment. No recurring schedules or complex dependencies to manage. |
+| **PGVector** | Vector search inside PostgreSQL | Not used. Qdrant is purpose-built for vector search and keeps the stack modular. PGVector would eliminate a service but couples vector search to PostgreSQL. |
+| **MinSearch** | In-memory keyword search (course module 1) | Not used. BM25 via `rank-bm25` provides better ranking and scales beyond in-memory datasets. |
+
 ## Ingestion Pipeline
 
 ```bash
