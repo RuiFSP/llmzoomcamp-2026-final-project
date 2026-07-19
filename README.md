@@ -151,8 +151,9 @@ The UI is in Portuguese (PT-PT). Here are example questions you can ask:
 | Pergunta | Resposta esperada |
 |---|---|
 | O que é o cozido à portuguesa? | Explica o prato tradicional com carnes, enchidos e vegetais cozidos. |
-| Qual o vinho ideal para acompanhar bacalhau? | Sugere vinhos brancos encorpados ou tintos leves, como Vinho Verde branco, Dão branco ou Bairrada tinto. |
-| Como se faz a caldo verde? | Descreve a sopa com couve galega, batata, cebola, alho e chouriço. |
+| O que é a caldo verde? | Descreve a sopa com couve galega, batata, cebola, alho e chouriço. |
+| O que são vinhos generosos? | Explica o que são vinhos generosos portugueses como Porto e Madeira. |
+| Quais são as castas mais plantadas em Portugal? | Lista as castas brancas e tintas mais cultivadas. |
 | Quais são as principais regiões vitivinícolas de Portugal? | Lista Vinho Verde, Douro, Dão, Bairrada, Alentejo, Península de Setúbal, Lisboa e Algarve. |
 
 ---
