@@ -178,10 +178,21 @@
     gap: 8px;
   }
   .loading-dots::before {
-    content: "A pesquisar...";
+    content: "A consultar base de conhecimento...";
     font-style: italic;
     color: #999;
     font-size: 13px;
+  }
+  .loading-dots::after {
+    content: "pode demorar alguns segundos";
+    font-style: normal;
+    color: #bbb;
+    font-size: 11px;
+    display: block;
+    margin-top: 4px;
+  }
+  #loading-msg .bubble {
+    padding-bottom: 16px;
   }
   .loading-dots span {
     width: 8px;
