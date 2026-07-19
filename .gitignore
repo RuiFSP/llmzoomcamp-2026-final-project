@@ -32,4 +32,7 @@ Thumbs.db
 # Docker context
 .dockerignore
 
+# opencode CLI tool
+.opencode/
+
 .opencode
