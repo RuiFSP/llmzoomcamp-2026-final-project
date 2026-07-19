@@ -47,7 +47,7 @@ flowchart LR
     Q["User question"] --> QR["Query Rewriter<br/>GPT-4o mini"]
     QR --> EMB["Embedder<br/>multilingual-e5-small"]
     EMB --> HYB["Hybrid Search<br/>Dense + Sparse (RRF)"]
-    HYB --> RR["Re-ranker<br/>cross-encoder<br/>top-20 to top-5"]
+    HYB --> RR["Re-ranker<br/>cross-encoder<br/>top-50 to top-5"]
     RR --> LLM["Answer Generator<br/>GPT-4o"]
     LLM --> R["Answer + Citations"]
 ```
@@ -66,7 +66,7 @@ flowchart LR
 | **Query Rewriter** | GPT-4o mini |
 | **Answer Generator** | GPT-4o |
 | **Orchestration** | Docker Compose (5 services + optional Caddy) |
-| **Cloud Reverse Proxy** | Caddy (auto TLS via Let's Encrypt, profile: `cloud`) |
+| **Cloud Reverse Proxy** | Caddy (auto TLS via Let's Encrypt with a domain, profile: `cloud`) |
 
 ## Data Sources
 
@@ -74,8 +74,8 @@ flowchart LR
 |---|---|---|
 | **Wikipedia PT** | "Gastronomia de Portugal" article | Portuguese cuisine, regional dishes, traditional recipes |
 | **Wikipedia EN** | "Portuguese cuisine" + "List of Portuguese dishes" | English-language coverage of Portuguese gastronomy |
-| **Infovini** | Scraped wine portal | Wine regions, grape varieties, wine-food pairings |
-| **MDPI Recipe Dataset** | Academic recipe dataset (1382 recipes, CC-BY) | Structured Portuguese recipe data with ingredients |
+| **Infovini** | Scraped wine portal | Wine regions, grape varieties |
+| **MDPI Recipe Dataset** | Academic recipe dataset (1389 recipes, CC-BY) | Structured Portuguese recipe data with ingredients |
 
 ## Technology Decisions
 

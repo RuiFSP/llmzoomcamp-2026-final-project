@@ -74,7 +74,7 @@ Tourists and food enthusiasts exploring Portuguese gastronomy face information s
 | **Re-ranker** | `cross-encoder/ms-marco-MiniLM-L-6-v2` |
 | **Query Rewriter** | GPT-4o mini |
 | **Answer Generator** | GPT-4o |
-| **Orchestration** | Docker Compose + optional Caddy |
+| **Orchestration** | Docker Compose (4 services + optional Caddy for TLS) |
 
 ## Evaluation Criteria
 
