@@ -12,65 +12,74 @@ The target users are tourists visiting Portugal, food enthusiasts curious about 
 
 ---
 
-## Tech Stack & Architecture
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Docker["Docker Compose"]
+        API["Flask API<br/>(gunicorn)"]
+        QD["Qdrant<br/>(vectors)"]
+        PG[("PostgreSQL<br/>(logs)")]
+        GF["Grafana<br/>(monitoring)"]
+        CD["Caddy<br/>(reverse proxy)"]
+
+        API --> QD
+        API --> PG
+        PG --> GF
+        CD -.-> API
+    end
+
+    subgraph UI["User Interface"]
+        CHAT["Chat UI<br/>(static HTML/JS)"]
+    end
+
+    subgraph ING["Ingestion CLI"]
+        WP["Wikipedia<br/>PT + EN"]
+        IV["Infovini<br/>wine portal"]
+        MD["MDPI<br/>recipe dataset"]
+        CHUNK["Chunking<br/>+ Embedding"]
+        QD_UPLOAD["Qdrant<br/>upload"]
+
+        WP --> CHUNK
+        IV --> CHUNK
+        MD --> CHUNK
+        CHUNK --> QD_UPLOAD
+        QD_UPLOAD --> QD
+    end
+
+    CHAT --> API
+    USER["User"] --> CHAT
+```
+
+### Query Flow
+
+```mermaid
+flowchart LR
+    Q["User question"] --> QR[Query Rewriter<br/>GPT-4o mini]
+    QR --> EMB[Embedder<br/>multilingual-e5-small]
+    EMB --> HYB[Hybrid Search<br/>Dense + Sparse (RRF)]
+    HYB --> RR[Re-ranker<br/>cross-encoder<br/>top-20 → top-5]
+    RR --> LLM[Answer Generator<br/>GPT-4o]
+    LLM --> R["Answer + Citations"]
+```
+
+---
+
+## Tech Stack
 
 | Component | Technology |
 |---|---|
 | **API** | Flask + Gunicorn |
 | **Vector DB** | Qdrant (dense + sparse hybrid search) |
 | **Metadata / Logs** | PostgreSQL 16 |
-| **Monitoring** | Grafana (7 panels, PostgreSQL datasource) |
+| **Monitoring** | Grafana (8 panels, PostgreSQL datasource) |
 | **Embeddings** | `intfloat/multilingual-e5-small` (384-dim, in-process) |
 | **Sparse Retrieval** | BM25 via `rank-bm25` |
 | **Re-ranker** | `cross-encoder/ms-marco-MiniLM-L-6-v2` |
 | **Query Rewriter** | GPT-4o mini |
 | **Answer Generator** | GPT-4o |
-| **Orchestration** | Docker Compose (4 services + optional Caddy) |
+| **Orchestration** | Docker Compose (5 services + optional Caddy) |
 | **Cloud Reverse Proxy** | Caddy (auto TLS via Let's Encrypt, profile: `cloud`) |
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Docker Compose                        │
-│                                                              │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  │
-│  │   Flask API   │───▶│   Qdrant     │    │  PostgreSQL  │  │
-│  │  (gunicorn)   │    │  (vectors)   │    │  (metadata)  │  │
-│  └──────┬───────┘    └──────────────┘    └──────┬───────┘  │
-│         │                                       │          │
-│         │  ┌──────────────────┐                 │          │
-│         ├──▶  Ingestion CLI   │                 │          │
-│         │  └──────────────────┘                 │          │
-│         │                                       │          │
-│         │                              ┌────────┴──────┐  │
-│         │                              │    Grafana    │  │
-│         │                              │  (dashboards) │  │
-│         │                              └───────────────┘  │
-│  ┌──────┴───────┐                                         │
-│  │   Chat UI    │                                         │
-│  │  (static)    │                                         │
-│  └──────────────┘                                         │
-└─────────────────────────────────────────────────────────────┘
-
-User Question
-    │
-    ▼
-[Query Rewriter] ── GPT-4o mini reformulates question
-    │
-    ▼
-[Embedder] ── multilingual-e5-small embeds the rewritten query
-    │
-    ▼
-[Hybrid Search] ── Qdrant search with dense vector + BM25 sparse vector
-    │      ┌─ top_k=20 candidates
-    ▼
-[Re-ranker] ── cross-encoder scores top 20 → returns top 5 chunks
-    │
-    ▼
-[Answer Generator] ── GPT-4o synthesizes answer from 5 chunks with citations
-    │
-    ▼
-[Response] ── answer + citations + chunk metadata
-```
 
 ---
 
@@ -80,8 +89,8 @@ User Question
 |---|---|---|
 | **Wikipedia PT** | "Gastronomia de Portugal" article | Portuguese cuisine, regional dishes, traditional recipes |
 | **Wikipedia EN** | "Portuguese cuisine" + "List of Portuguese dishes" | English-language coverage of Portuguese gastronomy |
-| **Infovini** | Scraped wine portal | Wine regions, grape varieties, wine-food pairings, wine producers |
-| **MDPI Recipe Dataset** | Academic recipe dataset (1382 recipes, CC-BY, CSV) | Structured Portuguese recipe data with ingredients and preparation |
+| **Infovini** | Scraped wine portal | Wine regions, grape varieties, wine-food pairings |
+| **MDPI Recipe Dataset** | Academic recipe dataset (1382 recipes, CC-BY) | Structured Portuguese recipe data with ingredients |
 
 ---
 
@@ -92,12 +101,12 @@ User Question
 - Docker and Docker Compose v2
 - An OpenAI API key with access to GPT-4o and GPT-4o mini
 
-### Steps
+### Local Development
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-org>/portuguese-food-wine-guide.git
-cd portuguese-food-wine-guide
+git clone https://github.com/RuiFSP/llmzoomcamp-2026-final-project.git
+cd llmzoomcamp-2026-final-project
 
 # 2. Configure environment
 cp .env.example .env
@@ -106,7 +115,7 @@ cp .env.example .env
 # 3. Build and start all services
 docker compose up --build
 
-# 4. Run the ingestion pipeline (in a separate terminal)
+# 4. Run the ingestion pipeline (populates the knowledge base)
 docker compose exec api python -m src.ingestion.run
 
 # 5. Open the chat UI
@@ -116,7 +125,13 @@ open http://localhost:5000
 open http://localhost:3000
 ```
 
-> **Note:** The first startup downloads two ML models (~500MB total) — `multilingual-e5-small` and the cross-encoder — which are cached in the Docker image layer. Expect 1–2 minutes for the initial build.
+> **Note:** The first build downloads two ML models (~500MB total) — `multilingual-e5-small` and the cross-encoder — which are cached in the Docker image layer. Expect 2–3 minutes for the initial build.
+
+### Resetting the Knowledge Base
+
+```bash
+docker compose exec api python -m src.ingestion.run --reset
+```
 
 ---
 
@@ -130,12 +145,6 @@ The UI is in Portuguese (PT-PT). Here are example questions you can ask:
 | Qual o vinho ideal para acompanhar bacalhau? | Sugere vinhos brancos encorpados ou tintos leves, como Vinho Verde branco, Dão branco ou Bairrada tinto. |
 | Como se faz a caldo verde? | Descreve a sopa com couve galega, batata, cebola, alho e chouriço. |
 | Quais são as principais regiões vitivinícolas de Portugal? | Lista Vinho Verde, Douro, Dão, Bairrada, Alentejo, Península de Setúbal, Lisboa e Algarve. |
-
-**Screenshot suggestions:**
-
-- **Chat UI:** Capture the landing page at `http://localhost:5000` with a conversation showing a question, the answer, and citation references.
-- **Grafana dashboard:** Capture the full Grafana dashboard at `http://localhost:3000` showing all 7 panels after a few queries.
-- **API response:** Show a `curl` example of `POST /api/chat` with a JSON response.
 
 ---
 
@@ -157,7 +166,7 @@ The UI is in Portuguese (PT-PT). Here are example questions you can ask:
 | Relevance (1–5) | 3.04 / 5 |
 | Faithfulness (1–5) | 5.00 / 5 |
 
-> Evaluated on a test set of 27 curated QA pairs (Wikipedia, Infovini, MDPI). Retrieval metrics computed across 4 strategies with k=[1,3,5,10]. LLM quality scored by GPT-4o-mini-as-judge. See `notebooks/` for reproduction.
+> Evaluated on a test set of 27 curated QA pairs (Wikipedia, Infovini, MDPI). Retrieval metrics across k=[1,3,5,10]. LLM quality scored by GPT-4o-mini-as-judge. See `notebooks/` for reproduction.
 
 ---
 
@@ -173,7 +182,7 @@ Grafana is auto-provisioned with a PostgreSQL datasource and a pre-built dashboa
 | Token Usage | Time series | Prompt and completion tokens per hour |
 | Error Rate (%) | Stat | Percentage of requests with exceptions |
 | Total Queries | Stat | Total questions asked |
-| Feedback Score (avg) | Stat | Average feedback score (1–5) |
+| Feedback Score (avg) | Stat | Average feedback score |
 | Total Response Time (ms) | Time series | End-to-end latency per hour |
 
 User feedback is collected via the `POST /api/feedback` endpoint.
@@ -182,25 +191,38 @@ User feedback is collected via the `POST /api/feedback` endpoint.
 
 ## Cloud Deployment
 
-The same Docker Compose stack runs on a cloud VM with one additional service (Caddy) for TLS termination.
+The same Docker Compose stack runs on a cloud VM with Caddy for automatic TLS termination.
+
+### Requirements
+
+- A DigitalOcean $6/mo droplet (or equivalent), Ubuntu 22.04+
+- A domain name pointing to the VM's IP (required for HTTPS)
+
+### Steps
 
 ```bash
-# Provision a fresh VM (installs Docker)
+# 1. Provision the VM (installs Docker)
 ./deploy/provision.sh root@<vm-ip>
 
-# Deploy the stack (rsync + docker compose up)
-./deploy/deploy.sh root@<vm-ip>
+# 2. Deploy the stack (rsync + docker compose up)
+./deploy/deploy.sh root@<vm-ip> your-domain.com
 ```
-
-Requirements:
-- A domain pointing to the VM's IP (Caddy auto-provisions Let's Encrypt TLS)
-- A DigitalOcean $6/mo droplet (or equivalent) is sufficient
 
 The Caddy reverse proxy is activated via the `cloud` Compose profile:
+
 ```bash
 export COMPOSE_PROFILES=cloud
+export DOMAIN=your-domain.com
 docker compose up -d --build
 ```
+
+### Endpoints (Cloud)
+
+| Service | URL |
+|---|---|
+| Chat UI | `http://<vm-ip>:5000` or `https://your-domain.com` |
+| API health | `http://<vm-ip>:5000/api/health` |
+| Grafana | `http://<vm-ip>:3000` (admin / admin) |
 
 ---
 
@@ -208,7 +230,9 @@ docker compose up -d --build
 
 - **Hybrid Search:** Dense (e5-small embeddings) + sparse (BM25) combined via Reciprocal Rank Fusion (RRF) for robust retrieval across query styles.
 - **Cross-encoder Re-ranking:** Top-20 hybrid results are re-scored by a cross-encoder (`ms-marco-MiniLM-L-6-v2`), returning the top-5 most relevant chunks.
-- **Query Rewriting:** User questions are reformulated by GPT-4o mini into standalone, search-optimized queries, improving retrieval for conversational or ambiguous questions. All techniques are documented and evaluated in the notebooks.
+- **Query Rewriting:** User questions are reformulated by GPT-4o mini into standalone, search-optimized queries, improving retrieval for conversational or ambiguous questions.
+- **Lazy Model Loading:** The cross-encoder model loads on first request, reducing startup memory usage.
+- **Error Logging:** All request metrics (latency, tokens, errors) are logged to PostgreSQL for monitoring via Grafana.
 
 ---
 
@@ -216,15 +240,16 @@ docker compose up -d --build
 
 ```
 src/
-  ingestion/       - Scrapers (Wikipedia, Infovini, MDPI), chunking, embedding, Qdrant index
-  search/          - BM25, dense search, hybrid fusion (RRF), cross-encoder re-ranker, query rewriter
-  api/             - Flask app, routes, PostgreSQL DB layer, answer generation, static chat UI
-  evaluation/      - Test set with 20+ curated QA pairs
-notebooks/         - Evaluation notebooks (retrieval + LLM metrics)
-dashboards/        - Grafana provisioning (datasource, dashboard provider, dashboard JSON)
-docker/            - Dockerfile, Caddyfile (cloud TLS), init-db.sql
-deploy/            - provision.sh (install Docker on VM), deploy.sh (rsync + compose up)
-data/              - Raw data / persistent volumes (mounted at /app/data in container)
+  ingestion/       Scrapers (Wikipedia, Infovini, MDPI), chunking, embedding, Qdrant index
+  search/          BM25, dense search, hybrid fusion (RRF), cross-encoder re-ranker, query rewriter
+  api/             Flask app, routes, PostgreSQL DB layer, answer generation, static chat UI
+  evaluation/      Test set with 27 curated QA pairs
+notebooks/         Evaluation notebooks (retrieval + LLM metrics)
+dashboards/        Grafana provisioning (datasource, dashboard JSON)
+docker/            Dockerfile, Caddyfile (cloud TLS), init-db.sql
+deploy/            provision.sh (install Docker on VM), deploy.sh (rsync + compose up)
+data/              Raw data (MDPI zip), mounted at /app/data in container
+.github/           CI/CD workflow (ruff lint + Docker build)
 ```
 
 ---
