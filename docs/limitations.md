@@ -18,7 +18,7 @@
 - **2GB+ VM** — Upgrade to a droplet with more RAM for faster inference.
 - **More data sources** — Add recipe websites, wine blogs, and gastronomy forums.
 - **MDPI recipe instructions** — Parse the PDF included in the MDPI dataset for actual preparation steps.
-- **Feedback UI buttons** — Add thumbs up/down buttons to the chat interface (the API endpoint already exists).
+- **Feedback UI buttons** ✅ — Thumbs up/down buttons added to the chat interface (July 2026).
 - **Streaming responses** — Show the answer incrementally as GPT-4o generates it.
 - **Query caching** — Cache frequent queries for instant responses.
 - **Async workers** — Switch to async gunicorn workers to handle concurrent requests.

@@ -15,4 +15,4 @@ Grafana is auto-provisioned with a PostgreSQL datasource and a pre-built dashboa
 
 Access at `http://localhost:3000` (login: `admin` / `admin`).
 
-User feedback is collected via the `POST /api/feedback` endpoint.
+User feedback is collected via the `POST /api/feedback` endpoint. The chat UI includes thumbs up/down buttons on each assistant response — clicking either sends a score (5 for positive, 1 for negative) to the API, and the result appears in the Feedback Score panel.
