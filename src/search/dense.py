@@ -11,7 +11,7 @@ class DenseRetriever:
         self.host = host or os.getenv("QDRANT_HOST", "localhost")
         self.port = port or int(os.getenv("QDRANT_PORT", "6333"))
         self.collection = collection
-        self.client = QdrantClient(host=self.host, port=self.port)
+        self.client = QdrantClient(host=self.host, port=self.port, check_compatibility=False)
         logger.info("DenseRetriever connected to %s:%s", self.host, self.port)
 
     def search(self, query_vector: list[float], k: int = 20) -> list[dict]:
