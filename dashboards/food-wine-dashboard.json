@@ -42,7 +42,7 @@
       "id": 6, "title": "Total Queries", "type": "stat",
       "gridPos": {"h": 8, "w": 8, "x": 8, "y": 16},
       "datasource": {"type": "postgres", "uid": "PostgreSQL"},
-      "description": "End-to-end latency from receiving the question to returning the answer (embedding + retrieval + LLM). The most important metric for user experience.",
+      "description": "Total number of chat questions asked since the system started.",
       "targets": [{"refId": "A", "rawSql": "SELECT COUNT(*) FROM conversations", "format": "table"}]
     },
     {
