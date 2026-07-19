@@ -2,6 +2,8 @@
 
 Internal reference for LLM Zoomcamp 2026 final project peer evaluation.
 
+Each criterion is scored 0–2 by peers. The final three rows are bonus (+1 or +2).
+
 | Criterion | How we meet it |
 |---|---|
 | Problem description | Well-defined domain (Portuguese food & wine), target users clearly identified (tourists, food enthusiasts), concrete problem statement |
