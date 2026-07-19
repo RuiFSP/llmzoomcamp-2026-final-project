@@ -94,7 +94,7 @@ def fetch_grape_varieties() -> list[dict]:
             varieties.append({
                 "name": name,
                 "description": description,
-                "region": grape_type,
+                "color": grape_type,
             })
 
     logger.info("Fetched %d grape varieties from Infovini", len(varieties))

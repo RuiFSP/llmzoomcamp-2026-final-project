@@ -29,7 +29,7 @@ def create_app() -> Flask:
     try:
         points, _ = dense_retriever.client.scroll(
             collection_name=dense_retriever.collection,
-            limit=10000,
+            limit=int(os.getenv("QDRANT_SCROLL_LIMIT", "10000")),
         )
         if points:
             docs = []

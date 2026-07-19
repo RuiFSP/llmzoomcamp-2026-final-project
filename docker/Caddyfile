@@ -1,3 +1,7 @@
-http://{$DOMAIN:localhost}:80 {
+{$DOMAIN:localhost}:80 {
+    reverse_proxy api:5000
+}
+
+{$DOMAIN:localhost} {
     reverse_proxy api:5000
 }

@@ -135,10 +135,6 @@ flowchart LR
 docker compose exec api python -m src.ingestion.run --reset
 ```
 
-```bash
-docker compose exec api python -m src.ingestion.run --reset
-```
-
 ---
 
 ## Usage Examples
