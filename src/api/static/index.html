@@ -4,36 +4,78 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guia de Comida e Vinho Português</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
-    background: #F4F1DE;
-    color: #3D405B;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #FDF8F3;
+    color: #3D3033;
     height: 100vh;
     display: flex;
     flex-direction: column;
   }
   header {
-    background: #3D405B;
-    color: #F4F1DE;
-    padding: 16px 24px;
+    background: linear-gradient(135deg, #722F37 0%, #8B0000 100%);
+    color: #FDF8F3;
+    padding: 20px 24px 16px;
     text-align: center;
     flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(212,165,116,0.1) 0%, transparent 60%);
+    pointer-events: none;
   }
   header h1 {
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    position: relative;
   }
   header p {
     font-size: 13px;
-    opacity: 0.8;
+    opacity: 0.85;
     margin-top: 4px;
+    font-weight: 400;
+    position: relative;
+  }
+  #suggestions {
+    flex-shrink: 0;
+    padding: 12px 16px 4px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  #suggestions::-webkit-scrollbar { display: none; }
+  .suggestion-chip {
+    flex-shrink: 0;
+    background: #fff;
+    border: 1.5px solid #D4A574;
+    border-radius: 20px;
+    padding: 7px 16px;
+    font-size: 13px;
+    color: #722F37;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+  }
+  .suggestion-chip:hover {
+    background: #722F37;
+    color: #fff;
+    border-color: #722F37;
   }
   #chat-container {
     flex: 1;
@@ -45,71 +87,78 @@
     scroll-behavior: smooth;
   }
   .message {
-    max-width: 80%;
-    padding: 12px 16px;
-    border-radius: 12px;
-    line-height: 1.5;
-    font-size: 14px;
+    display: flex;
+    gap: 10px;
+    max-width: 85%;
     animation: fadeIn 0.3s ease;
   }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  .user {
-    background: #E07A5F;
+  .message.user { align-self: flex-end; flex-direction: row-reverse; }
+  .message.assistant { align-self: flex-start; }
+  .message.system { align-self: center; }
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .message.user .avatar { background: #722F37; }
+  .message.assistant .avatar { background: #C4975A; }
+  .message.system .avatar { display: none; }
+  .bubble {
+    padding: 12px 16px;
+    border-radius: 16px;
+    line-height: 1.6;
+    font-size: 14px;
+    min-width: 0;
+  }
+  .message.user .bubble {
+    background: #722F37;
     color: #fff;
-    align-self: flex-end;
     border-bottom-right-radius: 4px;
   }
-  .assistant {
+  .message.assistant .bubble {
     background: #fff;
-    color: #3D405B;
-    align-self: flex-start;
+    color: #3D3033;
     border-bottom-left-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
-  .system {
-    background: #81B29A;
+  .message.system .bubble {
+    background: #D4A574;
     color: #fff;
-    align-self: center;
     text-align: center;
     font-style: italic;
     border-radius: 20px;
     padding: 8px 20px;
     font-size: 13px;
-    max-width: 90%;
   }
-  .citations {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #e0e0e0;
-    font-size: 12px;
-  }
+  .citations { margin-top: 10px; }
   .citations summary {
     cursor: pointer;
-    color: #81B29A;
+    color: #C4975A;
     font-weight: 500;
+    font-size: 13px;
+    padding: 4px 0;
   }
   .citations ol {
     margin-top: 6px;
     padding-left: 20px;
+    font-size: 12px;
+    color: #666;
   }
-  .citations li {
-    margin-bottom: 4px;
-    word-break: break-word;
-  }
-  .citations a {
-    color: #3D405B;
-    text-decoration: none;
-  }
-  .citations a:hover {
-    text-decoration: underline;
-    color: #E07A5F;
-  }
+  .citations li { margin-bottom: 6px; line-height: 1.4; }
+  .citations strong { color: #722F37; }
+  .citations em { color: #999; }
   .citation-ref {
     display: inline-block;
-    background: #E07A5F;
+    background: #C4975A;
     color: #fff;
     font-size: 11px;
     font-weight: 600;
@@ -118,28 +167,57 @@
     margin: 0 1px;
     cursor: pointer;
   }
+  #loading-msg .bubble {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-bottom-left-radius: 4px;
+  }
+  .loading-dots {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .loading-dots::before {
+    content: "A pesquisar...";
+    font-style: italic;
+    color: #999;
+    font-size: 13px;
+  }
+  .loading-dots span {
+    width: 8px;
+    height: 8px;
+    background: #C4975A;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+  }
+  .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+  .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0s; }
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+  }
   #input-area {
     flex-shrink: 0;
     display: flex;
     gap: 8px;
     padding: 12px 16px;
     background: #fff;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid #E8DDD4;
   }
   #question-input {
     flex: 1;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #E8DDD4;
     border-radius: 24px;
     padding: 10px 16px;
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s;
+    font-family: 'Inter', sans-serif;
   }
-  #question-input:focus {
-    border-color: #81B29A;
-  }
+  #question-input:focus { border-color: #C4975A; }
   #send-btn {
-    background: #81B29A;
+    background: #722F37;
     color: #fff;
     border: none;
     border-radius: 50%;
@@ -152,73 +230,60 @@
     transition: background 0.2s;
     flex-shrink: 0;
   }
-  #send-btn:hover {
-    background: #6d9e86;
-  }
-  #send-btn:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-  }
-  #send-btn svg {
-    width: 18px;
-    height: 18px;
-  }
-  .loading-dots {
-    display: inline-flex;
-    gap: 6px;
-    align-items: center;
-    padding: 8px 0;
-  }
-  .loading-dots::before {
-    content: "A pesquisar...";
-    font-style: italic;
-    color: #81B29A;
-    margin-right: 8px;
-  }
-  .loading-dots span {
-    width: 10px;
-    height: 10px;
-    background: #81B29A;
-    border-radius: 50%;
-    animation: bounce 1.4s infinite ease-in-out both;
-  }
-  .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-  .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
-  .loading-dots span:nth-child(3) { animation-delay: 0s; }
-  @keyframes bounce {
-    0%, 80%, 100% { transform: scale(0); }
-    40% { transform: scale(1); }
-  }
+  #send-btn:hover { background: #8B0000; }
+  #send-btn:disabled { background: #ccc; cursor: not-allowed; }
+  #send-btn svg { width: 18px; height: 18px; }
   #error-banner {
     display: none;
-    background: #e74c3c;
+    background: #C0392B;
     color: #fff;
     text-align: center;
-    padding: 8px;
+    padding: 10px;
     font-size: 13px;
     flex-shrink: 0;
   }
-  #error-banner.show {
-    display: block;
+  #error-banner.show { display: block; }
+  footer {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 10px;
+    font-size: 11px;
+    color: #999;
+    border-top: 1px solid #E8DDD4;
+    background: #FDF8F3;
   }
+  footer a { color: #722F37; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
   @media (max-width: 600px) {
-    .message { max-width: 90%; font-size: 13px; }
-    header h1 { font-size: 17px; }
+    .message { max-width: 92%; }
+    header h1 { font-size: 18px; }
+    header p { font-size: 12px; }
     #input-area { padding: 8px 12px; }
+    .suggestion-chip { font-size: 12px; padding: 5px 12px; }
   }
 </style>
 </head>
 <body>
 <header>
-  <h1>Guia de Comida & Vinho Português</h1>
-  <p>Tire as suas dúvidas sobre gastronomia e vinhos de Portugal</p>
+  <h1>&#127862; Guia de Comida &amp; Vinho Portugu&ecirc;s</h1>
+  <p>Tire as suas d&uacute;vidas sobre gastronomia e vinhos de Portugal</p>
 </header>
 <div id="error-banner"></div>
 <div id="chat-container">
-  <div class="message system">Olá! Pergunte-me sobre comida e vinho portugueses. 🍷</div>
+  <div class="message system">
+    <span class="avatar"></span>
+    <div class="bubble">Ol&aacute;! Pergunte-me sobre comida e vinho portugueses. &#127862;</div>
+  </div>
+</div>
+<div id="suggestions">
+  <div class="suggestion-chip" onclick="sendSuggestion(this)">O que &eacute; o cozido &agrave; portuguesa?</div>
+  <div class="suggestion-chip" onclick="sendSuggestion(this)">O que &eacute; o vinho verde?</div>
+  <div class="suggestion-chip" onclick="sendSuggestion(this)">Vinho para acompanhar bacalhau?</div>
+  <div class="suggestion-chip" onclick="sendSuggestion(this)">Regi&otilde;es vin&iacute;colas de Portugal</div>
+  <div class="suggestion-chip" onclick="sendSuggestion(this)">O que &eacute; pastel de nata?</div>
 </div>
 <div id="input-area">
-  <input id="question-input" type="text" placeholder="Faça uma pergunta..." autocomplete="off">
+  <input id="question-input" type="text" placeholder="Fa&ccedil;a uma pergunta..." autocomplete="off">
   <button id="send-btn" aria-label="Enviar">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -226,164 +291,163 @@
     </svg>
   </button>
 </div>
-<div id="error-banner"></div>
-<div id="js-error" style="display:none;background:#e74c3c;color:#fff;text-align:center;padding:12px;font-size:14px;flex-shrink:0;"></div>
+<footer>Feito com &#10084;&#65039; para <a href="https://github.com/RuiFSP/llmzoomcamp-2026-final-project" target="_blank">LLM Zoomcamp 2026</a></footer>
 <script>
-  (function() {
-    try {
-      var CONVERSATION_KEY = 'foodwine_conversation_id';
-      var conversationId = null;
-      try { conversationId = sessionStorage.getItem(CONVERSATION_KEY); } catch (e) {}
-      if (!conversationId) {
-        try { conversationId = crypto.randomUUID(); } catch (e) {
-          conversationId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-          });
-        }
-        try { sessionStorage.setItem(CONVERSATION_KEY, conversationId); } catch (e) {}
-      }
+(function() {
+  function generateId() {
+    try { return crypto.randomUUID(); } catch (e) {}
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+  var CONVERSATION_KEY = 'foodwine_conversation_id';
+  var conversationId = null;
+  try { conversationId = sessionStorage.getItem(CONVERSATION_KEY); } catch (e) {}
+  if (!conversationId) {
+    conversationId = generateId();
+    try { sessionStorage.setItem(CONVERSATION_KEY, conversationId); } catch (e) {}
+  }
 
-      var chatContainer = document.getElementById('chat-container');
-      var inputEl = document.getElementById('question-input');
-      var sendBtn = document.getElementById('send-btn');
-      var errorBanner = document.getElementById('error-banner');
-      var jsError = document.getElementById('js-error');
+  var chatContainer = document.getElementById('chat-container');
+  var inputEl = document.getElementById('question-input');
+  var sendBtn = document.getElementById('send-btn');
+  var errorBanner = document.getElementById('error-banner');
+  var suggestionsEl = document.getElementById('suggestions');
 
-      if (!chatContainer || !inputEl || !sendBtn) {
-        var errDiv = jsError || document.createElement('div');
-        errDiv.textContent = 'Erro de inicialização: elementos da UI não encontrados. Recarregue a página.';
-        errDiv.style.display = 'block';
-        if (!jsError) document.body.prepend(errDiv);
-        return;
-      }
+  function scrollToBottom() {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
 
-      function scrollToBottom() {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }
+  function showError(msg) {
+    errorBanner.textContent = msg;
+    errorBanner.classList.add('show');
+    setTimeout(function() { errorBanner.classList.remove('show'); }, 6000);
+  }
 
-      function showError(msg) {
-        errorBanner.textContent = msg;
-        errorBanner.classList.add('show');
-        setTimeout(function() { errorBanner.classList.remove('show'); }, 6000);
-      }
+  function formatContent(text) {
+    return text
+      .replace(/\[(\d+)\]/g, '<sup class="citation-ref">$1</sup>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+  }
 
-      function formatContent(text) {
-        return text.replace(/\[(\d+)\]/g, '<sup class=\"citation-ref\">$1</sup>');
-      }
-
-      function addMessage(role, content, citations) {
-        var div = document.createElement('div');
-        div.className = 'message ' + role;
-        var contentP = document.createElement('div');
-        contentP.innerHTML = formatContent(content);
-        div.appendChild(contentP);
-        if (citations && citations.length > 0) {
-          var details = document.createElement('details');
-          details.className = 'citations';
-          var summary = document.createElement('summary');
-          summary.textContent = 'Fontes (' + citations.length + ')';
-          details.appendChild(summary);
-          var ol = document.createElement('ol');
-          citations.forEach(function(c) {
-            var li = document.createElement('li');
-            var preview = c.text_preview.length > 80 ? c.text_preview.substring(0, 80) + '…' : c.text_preview;
-            li.innerHTML = '<strong>[' + c.id + ']</strong> ' + c.title + ' <em>(' + c.source + ')</em><br><small>' + preview + '</small>';
-            ol.appendChild(li);
-          });
-          details.appendChild(ol);
-          div.appendChild(details);
-        }
-        chatContainer.appendChild(div);
-        scrollToBottom();
-      }
-
-      function showLoading() {
-        var div = document.createElement('div');
-        div.className = 'message assistant';
-        div.id = 'loading-msg';
-        div.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
-        chatContainer.appendChild(div);
-        scrollToBottom();
-      }
-
-      function removeLoading() {
-        var el = document.getElementById('loading-msg');
-        if (el) el.remove();
-      }
-
-      function setLoading(loading) {
-        sendBtn.disabled = loading;
-        inputEl.disabled = loading;
-        if (loading) showLoading();
-        else removeLoading();
-      }
-
-      async function sendMessage() {
-        try {
-          var question = inputEl.value.trim();
-          if (!question) return;
-
-          inputEl.value = '';
-          addMessage('user', question);
-          setLoading(true);
-
-          var res = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ question: question, conversation_id: conversationId }),
-          });
-
-          if (!res.ok) {
-            var errData = {};
-            try { errData = await res.json(); } catch (e) {}
-            throw new Error(errData.error || 'Erro do servidor (' + res.status + ')');
-          }
-
-          var data = await res.json();
-          removeLoading();
-          if (data.answer.indexOf('Não tenho informação suficiente') !== -1) {
-            var div = document.createElement('div');
-            div.className = 'message system';
-            div.textContent = data.answer;
-            chatContainer.appendChild(div);
-            scrollToBottom();
-          } else {
-            addMessage('assistant', data.answer, data.citations || []);
-          }
-        } catch (err) {
-          removeLoading();
-          showError('Erro: ' + err.message + '. Tente novamente.');
-        } finally {
-          setLoading(false);
-          if (inputEl) inputEl.focus();
-        }
-      }
-
-      sendBtn.addEventListener('click', sendMessage);
-      inputEl.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          sendMessage();
-        }
+  function addMessage(role, content, citations) {
+    var div = document.createElement('div');
+    div.className = 'message ' + role;
+    var avatar = document.createElement('span');
+    avatar.className = 'avatar';
+    avatar.textContent = role === 'user' ? '\u{1F9D1}' : '\u{1F37E}';
+    div.appendChild(avatar);
+    var bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    var contentDiv = document.createElement('div');
+    contentDiv.innerHTML = formatContent(content);
+    bubble.appendChild(contentDiv);
+    if (citations && citations.length > 0) {
+      var details = document.createElement('details');
+      details.className = 'citations';
+      var summary = document.createElement('summary');
+      summary.textContent = 'Fontes (' + citations.length + ')';
+      details.appendChild(summary);
+      var ol = document.createElement('ol');
+      citations.forEach(function(c) {
+        var li = document.createElement('li');
+        var preview = c.text_preview.length > 80 ? c.text_preview.substring(0, 80) + '\u2026' : c.text_preview;
+        li.innerHTML = '<strong>[' + c.id + ']</strong> ' + c.title + ' <em>(' + c.source + ')</em><br><small>' + preview + '</small>';
+        ol.appendChild(li);
       });
-
-      inputEl.focus();
-    } catch (err) {
-      var errDiv = document.getElementById('js-error');
-      if (!errDiv) {
-        errDiv = document.createElement('div');
-        errDiv.style.background = '#e74c3c';
-        errDiv.style.color = '#fff';
-        errDiv.style.textAlign = 'center';
-        errDiv.style.padding = '12px';
-        errDiv.style.fontSize = '14px';
-        document.body.prepend(errDiv);
-      }
-      errDiv.textContent = 'Erro: ' + (err.message || err) + '. Recarregue a página ou contacte o administrador.';
-      errDiv.style.display = 'block';
+      details.appendChild(ol);
+      bubble.appendChild(details);
     }
-  })();
+    div.appendChild(bubble);
+    chatContainer.appendChild(div);
+    scrollToBottom();
+  }
+
+  function showLoading() {
+    var div = document.createElement('div');
+    div.className = 'message assistant';
+    div.id = 'loading-msg';
+    var avatar = document.createElement('span');
+    avatar.className = 'avatar';
+    avatar.textContent = '\u{1F37E}';
+    div.appendChild(avatar);
+    var bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+    div.appendChild(bubble);
+    chatContainer.appendChild(div);
+    scrollToBottom();
+  }
+
+  function removeLoading() {
+    var el = document.getElementById('loading-msg');
+    if (el) el.remove();
+  }
+
+  function setLoading(loading) {
+    sendBtn.disabled = loading;
+    inputEl.disabled = loading;
+    if (loading) showLoading();
+    else removeLoading();
+  }
+
+  async function sendMessage() {
+    try {
+      var question = inputEl.value.trim();
+      if (!question) return;
+      suggestionsEl.style.display = 'none';
+      inputEl.value = '';
+      addMessage('user', question);
+      setLoading(true);
+      var res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: question, conversation_id: conversationId }),
+      });
+      if (!res.ok) {
+        var errData = {};
+        try { errData = await res.json(); } catch (e) {}
+        throw new Error(errData.error || 'Erro do servidor (' + res.status + ')');
+      }
+      var data = await res.json();
+      removeLoading();
+      if (data.answer.indexOf('N\u00e3o tenho informa\u00e7\u00e3o suficiente') !== -1) {
+        var div = document.createElement('div');
+        div.className = 'message system';
+        var bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = data.answer;
+        div.appendChild(bubble);
+        chatContainer.appendChild(div);
+        scrollToBottom();
+      } else {
+        addMessage('assistant', data.answer, data.citations || []);
+      }
+    } catch (err) {
+      removeLoading();
+      showError('Erro: ' + err.message + '. Tente novamente.');
+    } finally {
+      setLoading(false);
+      if (inputEl) inputEl.focus();
+    }
+  }
+
+  window.sendSuggestion = function(el) {
+    inputEl.value = el.textContent;
+    sendMessage();
+  };
+
+  sendBtn.addEventListener('click', sendMessage);
+  inputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+  inputEl.focus();
+})();
 </script>
 </body>
 </html>
