@@ -3,7 +3,7 @@
 ## Current Limitations
 
 - **No food-wine pairing data** — The knowledge base does not contain explicit pairing information. Questions like "which wine goes with bacalhau?" cannot be answered.
-- **Slow response times (15–30s)** — On a 1GB RAM droplet, loading ML models and calling GPT-4o takes significant time. A 2GB+ VM would cut this in half.
+- **Slow response times (15–30s)** — On a 1GB RAM droplet, loading ML models and calling GPT-4o takes significant time. A 2GB+ VM would cut this in half. This is a hardware limitation, not an architecture issue — the pipeline itself is designed for low latency. In production, upgrading the VM or using dedicated inference endpoints would bring responses under 5s. This PoC deliberately operates within tight resource constraints to prove the concept at minimal cost.
 - **Limited knowledge base** — Only 1514 chunks from 3 sources. Does not cover all Portuguese dishes or wine varieties.
 - **MDPI recipes have no instructions** — The dataset only contains ingredient matrices, not preparation steps.
 - **No HTTPS without a domain** — Caddy can only provision TLS certificates when a real domain is configured.
