@@ -13,9 +13,10 @@ echo "==> Installing Docker on $HOST ..."
 ssh "$HOST" "
     apt-get update -qq
     apt-get install -y -qq ca-certificates curl
+    UBUNTU_CODENAME=\$(grep -oP 'VERSION_CODENAME=\K.*' /etc/os-release || echo "jammy")
     install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | tee /etc/apt/keyrings/docker.asc > /dev/null
-    echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu jammy stable' > /etc/apt/sources.list.d/docker.list
+    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \${UBUNTU_CODENAME} stable" > /etc/apt/sources.list.d/docker.list
     apt-get update -qq
     apt-get install -y -qq docker-ce docker-compose-plugin
     systemctl enable docker

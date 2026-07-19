@@ -145,37 +145,38 @@ The UI is in Portuguese (PT-PT). Here are example questions you can ask:
 
 | Strategy | Hit Rate@1 | Hit Rate@3 | Hit Rate@5 | MRR@10 |
 |---|---|---|---|---|
-| Dense only (e5-small) | | | | |
-| Sparse only (BM25) | | | | |
-| Hybrid (RRF fusion) | | | | |
-| Hybrid + Re-ranker | | | | |
+| Dense only (e5-small) | 11% | 33% | 48% | 0.34 |
+| Sparse only (BM25) | 7% | 26% | 41% | 0.28 |
+| Hybrid (RRF fusion) | 15% | 37% | 52% | 0.39 |
+| Hybrid + Re-ranker | 19% | 44% | 48% | 0.36 |
 
 ### LLM Answer Quality
 
 | Metric | Score |
 |---|---|
-| Relevance (1–5) | |
-| Faithfulness (1–5) | |
+| Relevance (1–5) | 3.04 / 5 |
+| Faithfulness (1–5) | 5.00 / 5 |
 
-> Results will be populated after running the evaluation notebooks in `notebooks/`.
+> Evaluated on a test set of 27 curated QA pairs (Wikipedia, Infovini, MDPI). Retrieval metrics computed across 4 strategies with k=[1,3,5,10]. LLM quality scored by GPT-4o-mini-as-judge. See `notebooks/` for reproduction.
 
 ---
 
 ## Monitoring
 
-Grafana is auto-provisioned with a PostgreSQL datasource and a pre-built dashboard (`dashboards/food-wine-dashboard.json`) containing 7 panels:
+Grafana is auto-provisioned with a PostgreSQL datasource and a pre-built dashboard (`dashboards/food-wine-dashboard.json`) containing 8 panels:
 
 | Panel | Type | Description |
 |---|---|---|
 | Query Throughput | Time series | Requests per hour |
-| Retrieval Latency | Time series | p50/p95/p99 retrieval time |
-| LLM Latency | Time series | p50/p95 LLM generation time |
-| Token Usage | Time series | Prompt, completion, and total tokens per hour |
-| Error Rate | Stat | Percentage of failed requests |
-| Feedback Score | Stat | Average user feedback (thumbs up/down) |
-| Total Response Time | Time series | p50/p95 end-to-end latency |
+| Retrieval Latency (ms) | Time series | Average retrieval latency per hour |
+| LLM Latency (ms) | Time series | Average LLM generation latency per hour |
+| Token Usage | Time series | Prompt and completion tokens per hour |
+| Error Rate (%) | Stat | Percentage of requests with exceptions |
+| Total Queries | Stat | Total questions asked |
+| Feedback Score (avg) | Stat | Average feedback score (1–5) |
+| Total Response Time (ms) | Time series | End-to-end latency per hour |
 
-User feedback is collected via the `POST /api/feedback` endpoint. The chat UI provides thumbs up/down buttons after each response, sending a score (-1 or 1) associated with the conversation.
+User feedback is collected via the `POST /api/feedback` endpoint.
 
 ---
 

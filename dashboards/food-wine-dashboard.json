@@ -33,21 +33,28 @@
     },
     {
       "id": 5, "title": "Error Rate (%)", "type": "stat",
-      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 16},
+      "gridPos": {"h": 8, "w": 8, "x": 0, "y": 16},
       "datasource": {"type": "postgres", "uid": "PostgreSQL"},
       "description": "Percentage of chat requests that failed with an exception (e.g. Qdrant down, OpenAI API errors, embedding failures). 0% means all requests completed successfully.",
       "targets": [{"refId": "A", "rawSql": "SELECT ROUND(COUNT(*) FILTER (WHERE error IS NOT NULL AND error != '') * 100.0 / NULLIF(COUNT(*), 0), 1) AS pct FROM conversations", "format": "table"}]
     },
     {
       "id": 6, "title": "Total Queries", "type": "stat",
-      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 16},
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 16},
       "datasource": {"type": "postgres", "uid": "PostgreSQL"},
-      "description": "Total number of chat questions asked since the system started.",
+      "description": "End-to-end latency from receiving the question to returning the answer (embedding + retrieval + LLM). The most important metric for user experience.",
       "targets": [{"refId": "A", "rawSql": "SELECT COUNT(*) FROM conversations", "format": "table"}]
     },
     {
-      "id": 7, "title": "Total Response Time (ms)", "type": "timeseries",
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16},
+      "id": 7, "title": "Feedback Score (avg)", "type": "stat",
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 16},
+      "datasource": {"type": "postgres", "uid": "PostgreSQL"},
+      "description": "Average user feedback score (1-5). Only considers conversations where feedback was submitted.",
+      "targets": [{"refId": "A", "rawSql": "SELECT ROUND(COALESCE(AVG(feedback), 0), 2) FROM conversations WHERE feedback != 0", "format": "table"}]
+    },
+    {
+      "id": 8, "title": "Total Response Time (ms)", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24},
       "datasource": {"type": "postgres", "uid": "PostgreSQL"},
       "description": "End-to-end latency from receiving the question to returning the answer (embedding + retrieval + LLM). The most important metric for user experience.",
       "targets": [{"refId": "A", "rawSql": "SELECT DATE_TRUNC('hour', created_at) AS time, AVG(total_latency_ms)::int FROM conversations GROUP BY 1 ORDER BY 1", "format": "time_series"}]

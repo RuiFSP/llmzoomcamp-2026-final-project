@@ -61,7 +61,7 @@ TEST_SET = [  # noqa: E501
     },  # noqa: E501
     {  # noqa: E501
         "question": "O que são travesseiros de Sintra?",  # noqa: E501
-        "answer": "Travesseiros de Sintra são doces típicos da vila de Sintra, feitos com massa folhada recheada de creime de amêndoa e gema de ovo.",  # noqa: E501
+        "answer": "Travesseiros de Sintra são doces típicos da vila de Sintra, feitos com massa folhada recheada de creme de amêndoa e gema de ovo.",  # noqa: E501
         "source": "wikipedia_pt"  # noqa: E501
     },  # noqa: E501
     {  # noqa: E501
