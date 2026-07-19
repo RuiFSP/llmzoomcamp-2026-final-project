@@ -165,12 +165,19 @@
   }
   .loading-dots {
     display: inline-flex;
-    gap: 4px;
+    gap: 6px;
     align-items: center;
+    padding: 8px 0;
+  }
+  .loading-dots::before {
+    content: "A pesquisar...";
+    font-style: italic;
+    color: #81B29A;
+    margin-right: 8px;
   }
   .loading-dots span {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     background: #81B29A;
     border-radius: 50%;
     animation: bounce 1.4s infinite ease-in-out both;
