@@ -2,6 +2,29 @@
 
 RAG assistant for Portuguese cuisine, traditional recipes, wine regions, and food-wine pairings.
 
+## Quick Start
+
+```bash
+# 1. Clone and enter the project
+git clone https://github.com/RuiFSP/llmzoomcamp-2026-final-project.git
+cd llmzoomcamp-2026-final-project
+
+# 2. Set your OpenAI API key
+cp .env.example .env
+# Edit .env and set OPENAI_API_KEY=sk-...
+
+# 3. Start all services
+docker compose up --build
+
+# 4. In another terminal, ingest the knowledge base
+docker compose exec api python -m src.ingestion.run
+
+# 5. Open the chat UI
+open http://localhost:5000
+```
+
+> First build downloads ML models (~500MB) — expect 2–3 minutes.
+
 ---
 
 ## Problem Statement
@@ -102,33 +125,15 @@ flowchart LR
 - Docker and Docker Compose v2
 - An OpenAI API key with access to GPT-4o and GPT-4o mini
 
-### Local Development
+### Details
+
+- **Grafana:** available at `http://localhost:3000` (login: `admin` / `admin`)
+- **First build:** downloads two ML models (~500MB) cached in the Docker layer
+- **Reset ingestion:** re-run with `--reset` to delete and re-ingest all data
 
 ```bash
-# 1. Clone the repository
-git clone https://github.com/RuiFSP/llmzoomcamp-2026-final-project.git
-cd llmzoomcamp-2026-final-project
-
-# 2. Configure environment
-cp .env.example .env
-# Edit .env and set OPENAI_API_KEY=sk-...
-
-# 3. Build and start all services
-docker compose up --build
-
-# 4. Run the ingestion pipeline (populates the knowledge base)
-docker compose exec api python -m src.ingestion.run
-
-# 5. Open the chat UI
-open http://localhost:5000
-
-# 6. Open Grafana dashboards (admin / admin)
-open http://localhost:3000
+docker compose exec api python -m src.ingestion.run --reset
 ```
-
-> **Note:** The first build downloads two ML models (~500MB total) — `multilingual-e5-small` and the cross-encoder — which are cached in the Docker image layer. Expect 2–3 minutes for the initial build.
-
-### Resetting the Knowledge Base
 
 ```bash
 docker compose exec api python -m src.ingestion.run --reset
