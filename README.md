@@ -2,8 +2,6 @@
 
 RAG assistant for Portuguese cuisine, traditional recipes, wine regions, and food-wine pairings. Built for **LLM Zoomcamp 2026**.
 
-![Chat UI](screenshots/chat-ui.png)
-
 ## Quick Start
 
 ```bash
@@ -30,7 +28,7 @@ open http://localhost:5000
 ## Table of Contents
 
 - [Architecture & Tech Stack](docs/architecture.md)
-- [Setup & Running](docs/architecture.md#ingestion-pipeline)
+- [Ingestion Pipeline](docs/architecture.md#ingestion-pipeline)
 - [Evaluation Results](docs/evaluation.md)
 - [Monitoring (Grafana)](docs/monitoring.md)
 - [Cloud Deployment](docs/deployment.md)
