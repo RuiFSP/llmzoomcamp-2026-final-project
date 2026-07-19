@@ -2,6 +2,8 @@
 
 RAG assistant for Portuguese cuisine, traditional recipes, wine regions, and food-wine pairings. Built for **LLM Zoomcamp 2026**.
 
+![Portuguese Food & Wine Guide](screenshots/hero.png)
+
 ## Quick Start
 
 ```bash
