@@ -309,14 +309,14 @@
     }
 
     async function sendMessage() {
-      const question = inputEl.value.trim();
-      if (!question) return;
-
-      inputEl.value = '';
-      addMessage('user', question);
-      setLoading(true);
-
       try {
+        const question = inputEl.value.trim();
+        if (!question) return;
+
+        inputEl.value = '';
+        addMessage('user', question);
+        setLoading(true);
+
         const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -348,6 +348,9 @@
         setLoading(false);
         inputEl.focus();
       }
+    } catch (err) {
+      showError('Erro inesperado: ' + (err.message || err) + '. Recarregue a página.');
+    }
     }
 
     sendBtn.addEventListener('click', sendMessage);
