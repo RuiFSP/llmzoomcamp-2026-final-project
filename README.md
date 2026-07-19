@@ -77,7 +77,3 @@ Tourists and food enthusiasts exploring Portuguese gastronomy face information s
 | **Query Rewriter** | GPT-4o mini |
 | **Answer Generator** | GPT-4o |
 | **Orchestration** | Docker Compose (4 services + optional Caddy for TLS) |
-
-## Evaluation
-
-See [Evaluation Results](docs/evaluation.md) for retrieval metrics and LLM answer quality scores.
