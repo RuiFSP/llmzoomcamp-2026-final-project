@@ -19,6 +19,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      qdrant:
+        condition: service_started
     volumes:
       - ./data:/app/data
 
